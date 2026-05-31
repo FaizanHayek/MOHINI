@@ -7,13 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bungee+Outline&family=Bungee+Shade&family=Bungee&family=Permanent+Marker&family=Syne:wght@800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bungee+Outline&family=Bungee+Shade&family=Bungee&family=Permanent+Marker&family=Syne:wght@800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Great+Vibes&family=Cinzel:wght@600;700;800;900&display=swap');
         
         :root {
           --neon-pink: #ff00ff;
           --neon-cyan: #00ffff;
           --neon-yellow: #ffff00;
           --punk-red: #ff3e3e;
+          --val-red: #dc2626;
+          --val-gold: #fbbf24;
         }
 
         body {
@@ -228,6 +230,89 @@
             background: rgba(0, 0, 0, 0.9);
             border: 4px solid white;
             box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Countdown Pop Animation */
+        @keyframes countdown-pop {
+            0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+            75% { transform: scale(0.95); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .animate-countdown-pop {
+            animation: countdown-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        /* Valentine Seductive Font Styles */
+        .font-romance { font-family: 'Great Vibes', cursive; }
+        .font-serif-elegant { font-family: 'Playfair Display', serif; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+
+        /* Valentine Seductive Heart Beats */
+        @keyframes heart-beat {
+          0%, 100% { transform: scale(1); }
+          25% { transform: scale(1.08); }
+          40% { transform: scale(1.03); }
+          60% { transform: scale(1.12); }
+        }
+        .animate-heart-beat {
+          animation: heart-beat 1.4s infinite ease-in-out;
+        }
+
+        /* Ambient Floating Hearts background */
+        @keyframes float-heart {
+          0% { transform: translateY(110vh) translateX(0) scale(0.5) rotate(0deg); opacity: 0; }
+          10% { opacity: 0.7; }
+          90% { opacity: 0.7; }
+          100% { transform: translateY(-20vh) translateX(var(--twist, 80px)) scale(1.2) rotate(var(--angle, 45deg)); opacity: 0; }
+        }
+        .floating-heart-obj {
+          position: fixed;
+          pointer-events: none;
+          z-index: 0;
+          color: rgba(220, 38, 38, 0.25);
+          animation: float-heart var(--duration, 8s) ease-in-out infinite;
+        }
+
+        /* Romantic Seductive Button */
+        .btn-valentine {
+          position: relative;
+          background: linear-gradient(135deg, #ef4444, #7f1d1d);
+          color: #fef08a; /* Warm yellow/gold text */
+          font-weight: 800;
+          letter-spacing: 0.05em;
+          padding: 1rem 2rem;
+          border-radius: 9999px; /* Pill shape for romantic elegance */
+          box-shadow: 0 0 15px rgba(220, 38, 38, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+          border: 2px solid #f59e0b;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transform: skew(0deg);
+        }
+        .btn-valentine:hover {
+          transform: translateY(-2px) scale(1.03) skew(0deg);
+          box-shadow: 0 0 25px rgba(244, 63, 94, 0.75), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+          background: linear-gradient(135deg, #f43f5e, #be123c);
+          color: white;
+          border-color: #fcd34d;
+        }
+
+        /* Valentine Seductive Sector Pulsing */
+        @keyframes romantic-sector-pulse {
+            0% { filter: brightness(1) drop-shadow(0 0 0px #ef4444); }
+            50% { filter: brightness(1.3) drop-shadow(0 0 15px #fcd34d); }
+            100% { filter: brightness(1) drop-shadow(0 0 0px #ef4444); }
+        }
+        .romantic-sector {
+            transition: filter 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: 50px 50px;
+        }
+        .romantic-sector:hover {
+            animation: romantic-sector-pulse 0.8s infinite ease-in-out;
+            cursor: pointer;
+            transform: scale(1.02);
+            filter: brightness(1.15);
         }
     </style>
 <script type="importmap">

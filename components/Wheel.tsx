@@ -7,6 +7,7 @@ interface WheelProps {
   spinning: boolean;
   rotation: number;
   onSpinEnd: () => void;
+  theme?: 'cyber' | 'valentine';
 }
 
 // Wrap text into balanced lines of sensible character limits to avoid squishing and make reading effortless.
@@ -31,12 +32,27 @@ function wrapText(text: string, maxCharsPerLine: number = 13): string[] {
   return lines;
 }
 
-const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd }) => {
+const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd, theme = 'cyber' }) => {
   const wheelRef = useRef<SVGSVGElement>(null);
   const lastTickRotation = useRef(0);
 
   const numSegments = segments.length;
   const anglePerSegment = 360 / numSegments;
+
+  const isRomantic = theme === 'valentine';
+  const hubStop1 = isRomantic ? '#fef08a' : 'white';
+  const hubStop2 = isRomantic ? '#be123c' : '#00ffff';
+  const sectorClass = isRomantic ? 'romantic-sector' : 'punk-sector';
+  const innerHubColor = isRomantic ? '#450a0a' : 'black';
+  const strokeColor = isRomantic ? '#f59e0b' : 'white';
+  const pointerShapeClass = isRomantic 
+    ? 'bg-gradient-to-b from-amber-50 to-rose-200 border-4 border-amber-500 shadow-[0_4px_20px_rgba(239,68,68,0.6)] rounded-full' 
+    : 'bg-white border-4 border-black shadow-[10px_10px_0px_var(--neon-pink)]';
+  const outerRimGlow = spinning 
+    ? isRomantic 
+      ? '0 0 120px rgba(239,68,68,0.5)' 
+      : '0 0 120px rgba(0,255,255,0.4)' 
+    : 'none';
 
   useEffect(() => {
     const wheel = wheelRef.current;
@@ -81,16 +97,20 @@ const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd }
   }, [spinning, anglePerSegment]);
 
   return (
-    <div className="relative w-full max-w-[600px] aspect-square mx-auto">
+    <div className="relative w-full max-w-[340px] aspect-square mx-auto">
       {/* Pointer Container */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-6 z-40">
-        <div className={`w-10 h-14 bg-white border-4 border-black shadow-[10px_10px_0px_var(--neon-pink)] flex flex-col items-center justify-start pt-1 transition-transform duration-200 ${spinning ? 'translate-y-2' : ''}`}>
+        <div className={`w-10 h-14 ${pointerShapeClass} flex flex-col items-center justify-start pt-1.5 transition-transform duration-200 ${spinning ? 'translate-y-2' : ''}`}>
+          {isRomantic ? (
+            <div className="text-rose-600 text-lg leading-none select-none font-bold animate-heart-beat">♥</div>
+          ) : (
             <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-black"></div>
+          )}
         </div>
       </div>
 
       {/* Outer Glow Ring */}
-      <div className={`absolute inset-0 rounded-full border-[20px] border-white/5 transition-all duration-1000 ${spinning ? 'scale-110 opacity-100' : 'scale-100 opacity-20'}`} style={{ boxShadow: spinning ? '0 0 120px rgba(0,255,255,0.4)' : 'none' }}></div>
+      <div className={`absolute inset-0 rounded-full border-[20px] border-white/5 transition-all duration-1000 ${spinning ? 'scale-110 opacity-100' : 'scale-100 opacity-20'}`} style={{ boxShadow: outerRimGlow }}></div>
 
       {/* Funky Animation Wrapper */}
       <div className={`w-full h-full relative ${spinning ? 'animate-wheel-funky' : ''}`}>
@@ -98,7 +118,7 @@ const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd }
         <svg
           ref={wheelRef}
           viewBox="0 0 100 100"
-          className={`w-full h-full drop-shadow-[0_0_50px_rgba(255,0,255,0.2)] transition-transform duration-[6500ms] cubic-bezier(0.1, 0, 0.1, 1) ${spinning ? 'spin-blur' : ''}`}
+          className={`w-full h-full drop-shadow-[0_0_50px_${isRomantic ? 'rgba(239,68,68,0.25)' : 'rgba(255,0,255,0.2)'}] transition-transform duration-[6500ms] cubic-bezier(0.1, 0, 0.1, 1) ${spinning ? 'spin-blur' : ''}`}
           style={{ transform: `rotate(${rotation}deg)` }}
         >
           <defs>
@@ -106,12 +126,12 @@ const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd }
               <feDropShadow dx="0.15" dy="0.15" stdDeviation="0.15" floodColor="black" floodOpacity="0.95" />
             </filter>
             <radialGradient id="hubGlow">
-              <stop offset="0%" stopColor="white" />
-              <stop offset="100%" stopColor="#00ffff" />
+              <stop offset="0%" stopColor={hubStop1} />
+              <stop offset="100%" stopColor={hubStop2} />
             </radialGradient>
           </defs>
 
-          <circle cx="50" cy="50" r="49" fill="#111" stroke="white" strokeWidth="1.5" />
+          <circle cx="50" cy="50" r="49" fill={isRomantic ? '#120004' : '#111'} stroke={strokeColor} strokeWidth="1.5" />
           
           {segments.map((segment, i) => {
             const startAngle = i * anglePerSegment;
@@ -121,19 +141,13 @@ const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd }
             const y1 = 50 + 48 * Math.sin((Math.PI * (startAngle - 90)) / 180);
             const x2 = 50 + 48 * Math.cos((Math.PI * (endAngle - 90)) / 180);
             const y2 = 50 + 48 * Math.sin((Math.PI * (endAngle - 90)) / 180);
-
+ 
             const largeArcFlag = anglePerSegment > 180 ? 1 : 0;
             const pathData = `M 50 50 L ${x1} ${y1} A 48 48 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
-            const isLongText = segment.label.length > 25;
-            // Wrap text strictly to 11 characters to ensure a line changes and splits into multiple lines if it approaches borders
-            const labelLines = wrapText(segment.label, 11);
-            const numLines = labelLines.length;
-
-            // Positioning text closer to the circumference (radius ~32.5pt to ~34.0pt from center)
-            const fontSize = isLongText ? '2.5px' : '3.6px';
-            const lineHeight = isLongText ? 2.8 : 3.8;
-            const centerY = isLongText ? 16.5 : 17.5;
+            // Position the single ID letter perfectly in the sector
+            const fontSize = '7.5px';
+            const yPos = 20;
 
             return (
               <g key={segment.id}>
@@ -142,38 +156,32 @@ const Wheel: React.FC<WheelProps> = ({ segments, spinning, rotation, onSpinEnd }
                   fill={segment.color}
                   stroke="black"
                   strokeWidth="0.8"
-                  className="punk-sector"
+                  className={sectorClass}
                 />
                 <g transform={`rotate(${startAngle + anglePerSegment / 2}, 50, 50)`}>
-                  {labelLines.map((line, lIdx) => {
-                    const yPos = centerY - ((numLines - 1) * lineHeight) / 2 + lIdx * lineHeight;
-                    return (
-                      <text
-                        key={lIdx}
-                        x="50"
-                        y={yPos}
-                        className="wheel-text pointer-events-none"
-                        style={{ fontSize, filter: 'url(#textShadow)' }}
-                        textAnchor="middle"
-                      >
-                        {line}
-                      </text>
-                    );
-                  })}
+                  <text
+                    x="50"
+                    y={yPos}
+                    className="wheel-text pointer-events-none"
+                    style={{ fontSize, fontWeight: 500, filter: 'url(#textShadow)' }}
+                    textAnchor="middle"
+                  >
+                    {segment.id}
+                  </text>
                 </g>
               </g>
             );
           })}
           
           {/* Hub Decor */}
-          <circle cx="50" cy="50" r="10" fill="black" stroke="white" strokeWidth="1" />
+          <circle cx="50" cy="50" r="10" fill={innerHubColor} stroke={strokeColor} strokeWidth="1" />
           <circle cx="50" cy="50" r="6" fill="url(#hubGlow)" stroke="black" strokeWidth="1.5" className={spinning ? 'animate-pulse' : ''} />
         </svg>
       </div>
       
       {/* Decorative Outer Rim */}
       <div className={`absolute inset-[-15px] pointer-events-none rounded-full border border-white/10 transition-transform duration-[6500ms] ${spinning ? 'rotate-[-360deg]' : ''}`}></div>
-      <div className={`absolute inset-[-5px] pointer-events-none rounded-full border border-cyan-400/20 transition-transform duration-[8000ms] ${spinning ? 'rotate-[720deg]' : ''}`}></div>
+      <div className={`absolute inset-[-5px] pointer-events-none rounded-full border ${isRomantic ? 'border-amber-400/25' : 'border-cyan-400/20'} transition-transform duration-[8000ms] ${spinning ? 'rotate-[720deg]' : ''}`}></div>
     </div>
   );
 };
